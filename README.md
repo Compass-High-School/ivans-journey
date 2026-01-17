@@ -1,6 +1,6 @@
 # Compass High: Ivan's Journey 🎓
 
-Welcome to **Ivan's Journey**, a 2D stealth-adventure game built by [Your Name] for Compass High School! 
+Welcome to **Ivan's Journey**, a 2D stealth-adventure game built for Compass High School! 
 
 **[➡️ CLICK HERE TO PLAY NOW! ⬅️](https://compass-high-school.github.io/ivans-journey)**
 
