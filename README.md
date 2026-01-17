@@ -3,7 +3,6 @@
 Welcome to **Ivan's Journey**, a 2D stealth-adventure game built by [Your Name] for Compass High School! 
 
 **[➡️ CLICK HERE TO PLAY NOW! ⬅️](https://compass-high-school.github.io/ivans-journey)**
-*(Note: The link will work once the game is deployed)*
 
 ## 📖 The Story
 Help Ivan navigate the treacherous hallways of Compass High! Your goal is to collect all the missing homework assignments without getting caught by the Hall Monitors. Can you graduate with a perfect record?
