@@ -89,23 +89,34 @@ class TouchController:
         self.size = 65  
         gap = 15
         
-        # Move controls UP and INWARDS
-        base_y = SCREEN_HEIGHT - 180 
+        # --- FIXED COORDINATES ---
+        # Screen height is 600. Map ends at 440.
+        # Previous logic put buttons at y=645 (off screen).
+        # New base_y (Top of UP button) = 350
+        # This means:
+        # UP:    350 -> 415 (Overlaps map slightly)
+        # L/R:   430 -> 495 (In black bar)
+        # DOWN:  510 -> 575 (In black bar, safe from bottom edge)
+        
+        base_y = 350 
         base_x = 30
         
         # D-PAD (Left Side)
         self.btn_up = pygame.Rect(base_x + self.size + gap, base_y, self.size, self.size)
-        self.btn_down = pygame.Rect(base_x + self.size + gap, base_y + self.size*2 + gap*2, self.size, self.size)
         self.btn_left = pygame.Rect(base_x, base_y + self.size + gap, self.size, self.size)
         self.btn_right = pygame.Rect(base_x + self.size*2 + gap*2, base_y + self.size + gap, self.size, self.size)
+        self.btn_down = pygame.Rect(base_x + self.size + gap, base_y + self.size*2 + gap*2, self.size, self.size)
         
         # ACTION BUTTONS (Right Side)
-        # "RUN" button (Sprint)
-        self.btn_sprint = pygame.Rect(SCREEN_WIDTH - 210, base_y + 60, 80, 80)
-        # "GO" button (Start/Action)
-        self.btn_action = pygame.Rect(SCREEN_WIDTH - 110, base_y + 60, 80, 80)
+        # Align these with the "Left/Right" row (y=430) for better ergonomics
+        action_y = 430
         
-        self.font = pygame.font.SysFont('Arial', 20, bold=True)
+        # "RUN" button (Sprint)
+        self.btn_sprint = pygame.Rect(SCREEN_WIDTH - 210, action_y, 80, 80)
+        # "GO" button (Start/Action)
+        self.btn_action = pygame.Rect(SCREEN_WIDTH - 110, action_y, 80, 80)
+        
+        self.font = pygame.font.SysFont('Arial', 24, bold=True) # Slightly larger arrows
 
     def get_active_buttons(self):
         active = set()
@@ -139,7 +150,7 @@ class TouchController:
         
         # Action Buttons
         draw_btn(self.btn_sprint, "RUN", (200, 180, 50, 150)) # Yellowish
-        draw_btn(self.btn_action, "GO", (50, 180, 100, 150)) # Greenish - RENAMED to GO
+        draw_btn(self.btn_action, "GO", (50, 180, 100, 150)) # Greenish 
         
         screen.blit(s, (0,0))
 
@@ -261,7 +272,6 @@ class Game:
                     spd = random.choice([0.8, 1.0, 1.2, 1.5])
                     self.enemies.append(Enemy(x, y, 'horizontal', spd))
         
-        # Update message after counting homework
         self.message = f"Homework Collected: 0/{self.total_homework}"
 
     def handle_input(self):
@@ -269,7 +279,6 @@ class Game:
         touch_keys = self.touch_controls.get_active_buttons()
         current_time = pygame.time.get_ticks()
         
-        # SPACE OR ENTER OR 'GO' button
         is_action = keys[pygame.K_SPACE] or keys[pygame.K_RETURN] or 'ACTION' in touch_keys
         
         is_shift = keys[pygame.K_LSHIFT] or keys[pygame.K_RSHIFT] or 'SPRINT' in touch_keys
@@ -372,7 +381,6 @@ class Game:
             t2 = self.big_font.render("Ivan's Journey", True, WHITE)
             alpha = (math.sin(pygame.time.get_ticks() / 300) + 1) * 127
             
-            # UPDATED INSTRUCTION TEXT
             t3 = self.font.render("Press ENTER or Tap GO to Start", True, (255, 255, 255))
             t3.set_alpha(int(alpha))
 
