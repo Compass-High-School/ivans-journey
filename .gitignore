@@ -1,6 +1,14 @@
 # macOS
 .DS_Store
 
+# Python / pygbag build artifacts
+__pycache__/
+*.pyc
+build/
+dist/
+.venv/
+venv/
+
 # Raw source-art delivery (vendor PNGs + .ai source) — NOT used by the game.
 # The game loads its own sprites from assets/*.png. Kept locally, out of git.
 /Compass Quest Game Assets v1/

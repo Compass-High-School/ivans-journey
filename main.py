@@ -10,6 +10,7 @@ SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
 TILE_SIZE = 40
 FPS = 60
+ENEMY_SPEEDS = [0.8, 1.0, 1.2, 1.5]
 
 # --- COLORS ---
 BLACK = (15, 15, 25)
@@ -134,24 +135,26 @@ class TouchController:
 
     def draw(self, screen):
         s = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.SRCALPHA)
-        
-        def draw_btn(rect, label, color=TOUCH_BG):
-            pygame.draw.rect(s, color, rect, border_radius=15)
-            pygame.draw.rect(s, WHITE, rect, width=2, border_radius=15)
+        active = self.get_active_buttons()
+
+        def draw_btn(rect, label, is_active, color=TOUCH_BG):
+            fill = TOUCH_ACTIVE if (is_active and color == TOUCH_BG) else color
+            pygame.draw.rect(s, fill, rect, border_radius=15)
+            pygame.draw.rect(s, WHITE, rect, width=4 if is_active else 2, border_radius=15)
             if label:
                 text = self.font.render(label, True, WHITE)
                 s.blit(text, (rect.centerx - text.get_width()//2, rect.centery - text.get_height()//2))
 
         # D-Pad
-        draw_btn(self.btn_up, "▲")
-        draw_btn(self.btn_down, "▼")
-        draw_btn(self.btn_left, "◀")
-        draw_btn(self.btn_right, "▶")
-        
+        draw_btn(self.btn_up, "▲", 'UP' in active)
+        draw_btn(self.btn_down, "▼", 'DOWN' in active)
+        draw_btn(self.btn_left, "◀", 'LEFT' in active)
+        draw_btn(self.btn_right, "▶", 'RIGHT' in active)
+
         # Action Buttons
-        draw_btn(self.btn_sprint, "RUN", (200, 180, 50, 150)) # Yellowish
-        draw_btn(self.btn_action, "GO", (50, 180, 100, 150)) # Greenish 
-        
+        draw_btn(self.btn_sprint, "RUN", 'SPRINT' in active, (200, 180, 50, 150)) # Yellowish
+        draw_btn(self.btn_action, "GO", 'ACTION' in active, (50, 180, 100, 150)) # Greenish
+
         screen.blit(s, (0,0))
 
 class Game:
@@ -209,7 +212,9 @@ class Game:
                     img = pygame.image.load(path).convert_alpha()
                     if name in ['heart', 'compass']: self.assets[name] = pygame.transform.scale(img, (25, 25))
                     else: self.assets[name] = pygame.transform.scale(img, (TILE_SIZE, TILE_SIZE))
-                except: self.assets[name] = None
+                except pygame.error as e:
+                    print(f"Failed to load asset '{filename}': {e}")
+                    self.assets[name] = None
             else: self.assets[name] = None
 
     def create_confetti(self):
@@ -265,11 +270,11 @@ class Game:
                 elif tile == 'H': 
                     self.homework_items.append(pygame.Rect(x+10, y+10, 20, 20))
                     self.total_homework += 1
-                elif tile == 'E': 
-                    spd = random.choice([0.8, 1.0, 1.2, 1.5])
+                elif tile == 'E':
+                    spd = random.choice(ENEMY_SPEEDS)
                     self.enemies.append(Enemy(x, y, 'vertical', spd))
-                elif tile == 'R': 
-                    spd = random.choice([0.8, 1.0, 1.2, 1.5])
+                elif tile == 'R':
+                    spd = random.choice(ENEMY_SPEEDS)
                     self.enemies.append(Enemy(x, y, 'horizontal', spd))
         
         self.message = f"Homework Collected: 0/{self.total_homework}"
@@ -353,6 +358,7 @@ class Game:
                     self.final_time_str = self.get_time_string()
                     self.game_state = "GAME_OVER"
                     self.state_timer = pygame.time.get_ticks()
+                return
         
         for goal in self.goals:
             if player_rect.colliderect(goal):
@@ -508,6 +514,7 @@ class Game:
         while True:
             self.update()
             self.draw()
+            self.clock.tick(FPS)
             await asyncio.sleep(0)
 
 class Player:
